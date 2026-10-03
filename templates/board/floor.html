@@ -15,6 +15,7 @@
       <span class="leg-item filling">注水中</span>
       <span class="leg-item slaking">熟化中</span>
       <span class="leg-item drawn">已出灰</span>
+      <span class="leg-item peak-alert">峰值偏离告警</span>
     </div>
   </header>
 
@@ -38,22 +39,29 @@
     {% set pond = card.pond %}
     {% set batch = card.batch %}
     <a
-      class="pond-tile status-{{ pond.status }} {% if selected and selected.id == pond.id %}selected{% endif %}"
+      class="pond-tile status-{{ pond.status }} {% if card.alert %}is-alert{% endif %} {% if selected and selected.id == pond.id %}selected{% endif %}"
       role="listitem"
       href="{{ url_for('board.floor_plan', plant_id=active_plant.id, pond=pond.id) }}"
       data-action="click->board#openDrawer"
+      {% if card.alert %}aria-label="{{ pond.code }} 峰值偏离告警：低于目标 {{ '%.0f'|format(card.gap) }}℃"{% endif %}
     >
-      <span class="tile-code">{{ pond.code }}</span>
+      <span class="tile-top">
+        <span class="tile-code">{{ pond.code }}</span>
+        {% if card.alert %}<span class="tile-alert-badge" title="峰值低于目标 {{ '%.0f'|format(card.gap) }}℃">告警</span>{% endif %}
+      </span>
       <span class="tile-status">{{ status_labels.get(pond.status, pond.status) }}</span>
       <span class="tile-meta">
         {% if batch and batch.peak_temp_c is not none %}
-          峰值 {{ '%.0f'|format(batch.peak_temp_c) }}℃
+          峰值 {{ '%.0f'|format(batch.peak_temp_c) }}℃ / 目标 {{ '%.0f'|format(batch.target_temp_c) }}℃
         {% elif batch %}
           峰值未记
         {% else %}
           无批次
         {% endif %}
       </span>
+      {% if card.alert %}
+      <span class="tile-alert-gap">峰值低于目标 {{ '%.0f'|format(card.gap) }}℃（&gt;15℃）</span>
+      {% endif %}
       <span class="tile-cap">{{ '%.0f'|format(pond.capacity_m3) }} m³</span>
     </a>
     {% else %}
@@ -89,6 +97,12 @@
     <div class="drawer-body">
       <section class="batch-card">
         <h3>最近熟化批次</h3>
+        {% if selected_alert %}
+        <div class="alert-banner" role="alert">
+          <strong>峰值偏离告警</strong>
+          <span>本班峰值较目标温低 {{ '%.0f'|format(selected_gap) }}℃（超过 15℃），请关注熟化情况。仅提示，不影响出灰。</span>
+        </div>
+        {% endif %}
         {% if selected_batch %}
         <dl class="kv">
           <div><dt>开始</dt><dd>{{ selected_batch.started_at.strftime('%Y-%m-%d %H:%M') if selected_batch.started_at else '—' }}</dd></div>

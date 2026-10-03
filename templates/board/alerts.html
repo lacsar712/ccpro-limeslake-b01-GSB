@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}峰值偏离告警{% endblock %}
+{% block content %}
+<section class="alerts-page">
+  <header class="page-head">
+    <div>
+      <h1>峰值偏离告警</h1>
+      <p>口径：熟化中池位最近班次峰值已填，且低于本班目标温超过 15℃。仅作提示，不挡出灰（出灰仍须最近班峰值 ≥ 60℃）。</p>
+    </div>
+    <a class="btn ghost" href="{{ url_for('board.floor_plan') }}">返回平面图</a>
+  </header>
+
+  <div class="alert-summary">
+    当前告警池位 <strong>{{ total }}</strong> 个
+  </div>
+
+  {% for group in plant_groups %}
+  <section class="alert-plant">
+    <h2 class="alert-plant-name">{{ group.plant.name }}</h2>
+    <p class="plant-meta">{{ group.plant.location or '厂区位置未填' }} · {{ group.entries|length }} 个告警池</p>
+    <div class="pond-grid">
+      {% for item in group.entries %}
+      {% set pond = item.pond %}
+      {% set batch = item.batch %}
+      <a
+        class="pond-tile status-{{ pond.status }} is-alert"
+        href="{{ url_for('board.floor_plan', plant_id=pond.plant_id, pond=pond.id) }}"
+      >
+        <span class="tile-top">
+          <span class="tile-code">{{ pond.code }}</span>
+          <span class="tile-alert-badge">告警</span>
+        </span>
+        <span class="tile-status">{{ status_labels.get(pond.status, pond.status) }}</span>
+        <span class="tile-meta">
+          峰值 {{ '%.1f'|format(batch.peak_temp_c) }}℃ / 目标 {{ '%.1f'|format(batch.target_temp_c) }}℃
+        </span>
+        <span class="tile-alert-gap">低于目标 {{ '%.1f'|format(item.gap) }}℃（&gt;15℃）</span>
+        <span class="tile-cap">{{ '%.0f'|format(pond.capacity_m3) }} m³</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% else %}
+  <p class="empty-board">当前没有告警中的熟化池。</p>
+  {% endfor %}
+</section>
+{% endblock %}

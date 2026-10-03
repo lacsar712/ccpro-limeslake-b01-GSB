@@ -17,6 +17,10 @@
   --slake-ink: #3f6212;
   --drawn-bg: #e2e8f0;
   --drawn-ink: #475569;
+  --alert-bg: #fef3c7;
+  --alert-ink: #b45309;
+  --alert-strong: #d97706;
+  --alert-deep: #7c2d12;
 }
 
 * { box-sizing: border-box; }
@@ -200,6 +204,90 @@ body {
   background: linear-gradient(160deg, #f8fafc, var(--drawn-bg));
   color: var(--drawn-ink);
 }
+
+/* 峰值偏离告警：琥珀色覆盖状态底色，描边+角标，远看即可识别 */
+.pond-tile.is-alert {
+  background: linear-gradient(160deg, #fffbeb, var(--alert-bg));
+  color: var(--alert-deep);
+  border-color: var(--alert-strong);
+  box-shadow: 0 10px 24px rgba(217, 119, 6, 0.22);
+}
+
+.pond-tile.is-alert.selected {
+  outline: 2px solid var(--alert-strong);
+}
+
+.tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tile-alert-badge {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--alert-strong);
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.tile-alert-gap {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--alert-strong);
+}
+
+.leg-item.peak-alert { background: var(--alert-bg); color: var(--alert-deep); border: 1px solid var(--alert-strong); }
+
+.nav-alert { position: relative; }
+
+.alert-pill {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--alert-strong);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+.alert-banner {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--alert-strong);
+  background: var(--alert-bg);
+  color: var(--alert-deep);
+  font-size: 0.88rem;
+}
+
+.alert-banner strong { color: var(--alert-strong); }
+
+.alert-summary {
+  margin-bottom: 18px;
+  font-size: 0.95rem;
+  color: var(--slate);
+}
+
+.alert-summary strong {
+  font-size: 1.2rem;
+  color: var(--alert-strong);
+}
+
+.alert-plant { margin-bottom: 26px; }
+.alert-plant-name { margin: 0 0 4px; color: var(--slate-deep); }
 
 .tile-code {
   font-size: 1.35rem;
