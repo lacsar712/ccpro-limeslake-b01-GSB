@@ -15,6 +15,7 @@
       <span class="leg-item filling">注水中</span>
       <span class="leg-item slaking">熟化中</span>
       <span class="leg-item drawn">已出灰</span>
+      <span class="leg-item alert">峰值偏离告警</span>
     </div>
   </header>
 
@@ -38,7 +39,7 @@
     {% set pond = card.pond %}
     {% set batch = card.batch %}
     <a
-      class="pond-tile status-{{ pond.status }} {% if selected and selected.id == pond.id %}selected{% endif %}"
+      class="pond-tile status-{{ pond.status }} {% if card.alert %}tile-alert{% endif %} {% if selected and selected.id == pond.id %}selected{% endif %}"
       role="listitem"
       href="{{ url_for('board.floor_plan', plant_id=active_plant.id, pond=pond.id) }}"
       data-action="click->board#openDrawer"
@@ -54,6 +55,9 @@
           无批次
         {% endif %}
       </span>
+      {% if card.alert %}
+      <span class="tile-alert-flag">⚠ 峰值低于目标 {{ '%.0f'|format(card.deviation) }}℃</span>
+      {% endif %}
       <span class="tile-cap">{{ '%.0f'|format(pond.capacity_m3) }} m³</span>
     </a>
     {% else %}
@@ -96,6 +100,11 @@
           <div><dt>峰值</dt><dd>{% if selected_batch.peak_temp_c is not none %}{{ '%.1f'|format(selected_batch.peak_temp_c) }} ℃{% else %}未记录{% endif %}</dd></div>
           <div><dt>备注</dt><dd>{{ selected_batch.notes or '—' }}</dd></div>
         </dl>
+        {% if selected_alert %}
+        <p class="drawer-alert">
+          ⚠ 峰值偏离告警：峰值低于目标温 {{ '%.1f'|format(selected_deviation) }}℃（超过 15℃）。该提示不影响出灰。
+        </p>
+        {% endif %}
         {% else %}
         <p class="hint">尚无批次，无法出灰。</p>
         {% endif %}

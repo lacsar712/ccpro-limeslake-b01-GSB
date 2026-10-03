@@ -125,6 +125,7 @@ body {
 .leg-item.filling { background: var(--fill-bg); color: var(--fill-ink); }
 .leg-item.slaking { background: var(--slake-bg); color: var(--slake-ink); }
 .leg-item.drawn { background: var(--drawn-bg); color: var(--drawn-ink); }
+.leg-item.alert { background: #fee2e2; color: var(--danger); }
 
 .plant-chips {
   display: flex;
@@ -209,6 +210,75 @@ body {
 
 .tile-status { font-weight: 700; font-size: 0.95rem; }
 .tile-meta, .tile-cap { font-size: 0.85rem; opacity: 0.9; }
+
+/* 峰值偏离告警：瓦片红框 + 警示条 */
+.pond-tile.tile-alert {
+  border-color: #dc2626;
+  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.22);
+}
+
+.pond-tile.tile-alert:hover {
+  box-shadow: 0 14px 28px rgba(220, 38, 38, 0.28);
+}
+
+.tile-alert-flag {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--danger);
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+.drawer-alert {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* 告警专页 */
+.alerts-page { max-width: 1100px; }
+
+.alert-plant {
+  margin-bottom: 26px;
+}
+
+.alert-plant h2 {
+  margin: 0 0 10px;
+  color: var(--slate-deep);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-count {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--danger);
+  background: #fee2e2;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.alert-table td strong { color: var(--slate-deep); }
+
+.deviation-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--danger);
+  background: #fee2e2;
+}
 
 .empty-board {
   grid-column: 1 / -1;

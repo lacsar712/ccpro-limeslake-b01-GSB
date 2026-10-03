@@ -3,7 +3,13 @@ from flask_login import login_required
 
 from app.extensions import db
 from app.models import Plant, Pond
-from app.services.rules import RuleError, assert_can_set_pond_status, latest_batch_for_pond
+from app.services.rules import (
+    RuleError,
+    assert_can_set_pond_status,
+    is_peak_deviation_alert,
+    latest_batch_for_pond,
+    peak_temp_deviation,
+)
 
 bp = Blueprint("board", __name__, url_prefix="/board")
 
@@ -36,15 +42,26 @@ def floor_plan():
     pond_cards = []
     for pond in ponds:
         batch = latest_batch_for_pond(pond)
-        pond_cards.append({"pond": pond, "batch": batch})
+        pond_cards.append(
+            {
+                "pond": pond,
+                "batch": batch,
+                "alert": is_peak_deviation_alert(pond),
+                "deviation": peak_temp_deviation(pond),
+            }
+        )
 
     selected_id = request.args.get("pond", type=int)
     selected = None
     selected_batch = None
+    selected_alert = False
+    selected_deviation = None
     if selected_id:
         selected = next((c["pond"] for c in pond_cards if c["pond"].id == selected_id), None)
         if selected:
             selected_batch = latest_batch_for_pond(selected)
+            selected_alert = is_peak_deviation_alert(selected)
+            selected_deviation = peak_temp_deviation(selected)
 
     return render_template(
         "board/floor.html",
@@ -53,6 +70,8 @@ def floor_plan():
         pond_cards=pond_cards,
         selected=selected,
         selected_batch=selected_batch,
+        selected_alert=selected_alert,
+        selected_deviation=selected_deviation,
         status_labels=STATUS_LABELS,
     )
 
@@ -71,6 +90,10 @@ def pond_ops(pond_id: int):
         return redirect(
             url_for("board.floor_plan", plant_id=pond.plant_id, pond=pond.id)
         )
+
+    # 两人同时改同一班峰值时串行化：后提交者整版覆盖，库中只落一版，
+    # 告警名单与瓦片读取该版即与库对齐。
+    db.session.refresh(batch, with_for_update=True)
 
     if peak_raw:
         try:

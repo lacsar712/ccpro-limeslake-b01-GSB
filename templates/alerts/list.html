@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}峰值偏离告警{% endblock %}
+{% block content %}
+<section class="alerts-page">
+  <header class="page-head">
+    <div>
+      <h1>峰值偏离告警</h1>
+      <p>
+        口径：熟化中池最近批次峰值已填，且低于该班目标温超过 {{ '%.0f'|format(threshold) }}℃。
+        仅作提示，不影响出灰。当前共 <strong>{{ total }}</strong> 个池告警中。
+      </p>
+    </div>
+    <a class="btn ghost" href="{{ url_for('board.floor_plan') }}">返回平面图</a>
+  </header>
+
+  {% for section in sections %}
+  <section class="alert-plant">
+    <h2>
+      {{ section.plant.name }}
+      <span class="alert-count">{{ section.rows|length }} 池告警</span>
+    </h2>
+    <table class="data-table alert-table">
+      <thead>
+        <tr>
+          <th>池号</th>
+          <th>目标温 ℃</th>
+          <th>峰值 ℃</th>
+          <th>低于目标</th>
+          <th>批次开始</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in section.rows %}
+        <tr class="alert-row">
+          <td><strong>{{ row.pond.code }}</strong></td>
+          <td>{{ '%.1f'|format(row.batch.target_temp_c) }}</td>
+          <td>{{ '%.1f'|format(row.batch.peak_temp_c) }}</td>
+          <td><span class="deviation-badge">-{{ '%.1f'|format(row.deviation) }} ℃</span></td>
+          <td>{{ row.batch.started_at.strftime('%Y-%m-%d %H:%M') if row.batch.started_at else '—' }}</td>
+          <td>
+            <a href="{{ url_for('board.floor_plan', plant_id=section.plant.id, pond=row.pond.id) }}">
+              平面图处理
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% else %}
+  <p class="empty-board">当前没有告警池：所有熟化中池峰值与目标温偏差均在 {{ '%.0f'|format(threshold) }}℃ 以内。</p>
+  {% endfor %}
+</section>
+{% endblock %}

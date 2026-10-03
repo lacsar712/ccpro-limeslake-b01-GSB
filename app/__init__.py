@@ -31,11 +31,13 @@ def create_app() -> Flask:
     from app.blueprints.board import bp as board_bp
     from app.blueprints.batches import bp as batches_bp
     from app.blueprints.ponds import bp as ponds_bp
+    from app.blueprints.alerts import bp as alerts_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(board_bp)
     app.register_blueprint(ponds_bp)
     app.register_blueprint(batches_bp)
+    app.register_blueprint(alerts_bp)
 
     @app.route("/")
     def index():
